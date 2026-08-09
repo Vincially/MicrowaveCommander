@@ -1,0 +1,204 @@
+@page "/heating"
+@page "/"
+@using MicrowaveCommander.Front.Models
+@implements IDisposable
+
+<h3>Aquecimento</h3>
+<EditForm EditContext="@editContext" OnValidSubmit="ValidateInput">
+    <DataAnnotationsValidator />
+    <div class="form-row">
+        <div class="col-2 mb-3">
+            <label>Minutos</label>
+            <InputNumber inputmode="decimal" id="minutes" min="0" max="2" class="form-control" @bind-value="heatingModel.Minutes"/>
+        </div>
+        <div class="col-2 mb-3">
+            <label>Segundos</label>
+            <InputNumber inputmode="numeric" id="seconds" min="0" max="100" class="form-control" @bind-value="heatingModel.Seconds"/>
+            <ValidationMessage For="() => heatingModel.Seconds"></ValidationMessage>
+        </div>
+        <div class="col-3 mb-3">
+            <label>Potência</label>
+            <InputNumber inputmode="numeric" id="power" min="1" max="10" class="form-control" @bind-value="heatingModel.Power"/>
+            
+        </div>
+        <button type="submit" class="btn btn-primary">Iniciar Aquecimento</button>
+        <button type="button" class="btn btn-danger" @onclick="PauseStopHeating">Pausar/Parar</button>
+        <button type="button" class="btn btn-secondary" @onclick="FastStart">Inicio Rápido</button>
+        <div class="mt-3 mb-3">
+            <h3>Timer: @(currentMinutes.ToString().Length == 1 ? "0" : string.Empty)@currentMinutes:
+                @(currentSeconds.ToString().Length == 1 ? "0" : string.Empty)@currentSeconds</h3>
+        </div>
+        <div class="mt-3 mb-3">
+            <h3>Processing: @processing</h3>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private HeatingModel heatingModel = new HeatingModel();
+    private EditContext? editContext;
+    private ValidationMessageStore? messageStore;
+    private bool isHeating = false;
+    private int currentMinutes = 0;
+    private int currentSeconds = 0;
+    private string processing = "";
+    private string processingString = "";
+    private Timer? timer;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(heatingModel);
+        messageStore = new ValidationMessageStore(editContext);
+
+        editContext.OnFieldChanged += (sender, args) =>
+        {
+            messageStore.Clear();
+            editContext.NotifyValidationStateChanged();
+        };
+    }
+    
+    private void ValidateInput()
+    {
+        if (editContext == null || messageStore == null) return;
+        messageStore.Clear();
+        
+        if (!isHeating)
+        {
+            if (heatingModel.Minutes >= 2 && heatingModel.Seconds > 0)
+            {
+                var field = new FieldIdentifier(heatingModel, nameof(HeatingModel.Seconds));
+                messageStore.Add(field, "O tempo de aquecimento deve ser de 2 minutos ou menos!");
+                editContext.NotifyValidationStateChanged();
+                return;
+            }
+            if (heatingModel.Minutes == 0 && heatingModel.Seconds == 0)
+            {
+                var field = new FieldIdentifier(heatingModel, nameof(HeatingModel.Seconds));
+                messageStore.Add(field, "O tempo de aquecimento deve ter pelo menos 1 segundo de duração!");
+                editContext.NotifyValidationStateChanged();
+                return;
+            }
+        } 
+            StartHeating();
+    }
+    
+    private void AddHeatingTime(int minutes,int seconds)
+    {
+        var remainingSeconds = currentSeconds + seconds;
+        do
+        {
+            if (remainingSeconds >= 60)
+            {
+                currentMinutes++;
+                remainingSeconds = remainingSeconds - 60;
+            }
+        } while (remainingSeconds >= 60);
+
+        var remainingMinutes = currentMinutes + minutes;
+        currentMinutes =  remainingMinutes;
+        currentSeconds = remainingSeconds;
+    _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void StartHeating()
+    {
+        if (!isHeating)
+        {
+            processing = "";
+            processingString = GenerateProcessingString();
+            if (currentMinutes == 0 && currentSeconds == 0)
+            {
+                AddHeatingTime(heatingModel.Minutes,heatingModel.Seconds);
+                StartTimer();
+            }
+            else
+            {
+                StartTimer();
+            }
+        }
+        else
+        {
+            PauseTimer();
+            AddHeatingTime(0, 30);
+            StartTimer();
+        }
+    }
+    private string GenerateProcessingString()
+    {
+        var pattern = "";
+        for (int i = 0; i < heatingModel.Power; i++)
+        {
+            pattern += ".";
+        }
+        return pattern;
+    }
+
+    private void StartTimer()
+    {
+        timer = new Timer(TimerCallback, null, 1000, 1000);
+        isHeating = true;
+    }
+
+    private void TimerCallback(object? state)
+    {
+        if (currentSeconds > 0)
+        {
+            processing += processingString;
+            processing += " ";
+            currentSeconds--;
+        }
+        else
+        {
+            if (currentMinutes > 0)
+            {
+                processing += processingString;
+                processing += " ";
+                currentMinutes--;
+                currentSeconds = 59;
+            }
+            if (currentMinutes == 0 && currentSeconds == 0)
+            {
+                PauseTimer();
+                processing += "Aquecimento concluído!";
+            }
+        }
+        
+        _ = InvokeAsync(StateHasChanged);
+
+    }
+
+    private void PauseTimer()
+    {
+        isHeating = false;
+        timer?.Dispose();
+    }
+
+    private void ResetTimer()
+    {
+        PauseTimer();
+        currentMinutes = 0;
+        currentSeconds = 0;
+        processing = "";
+        heatingModel = new();
+    }
+
+    private void PauseStopHeating()
+    {
+        if (isHeating)
+            PauseTimer();
+        else
+            ResetTimer();
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+
+    private void FastStart()
+    {
+        heatingModel.Power = 10;
+        heatingModel.Seconds = 30;
+        StartHeating();
+    }
+}
