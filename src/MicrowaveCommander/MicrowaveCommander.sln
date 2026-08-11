@@ -2,9 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicrowaveCommander.Domain", "MicrowaveCommander.Domain\MicrowaveCommander.Domain.csproj", "{065AE2B9-D5DE-4ADA-924D-CB0740A58101}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicrowaveCommander.Application", "MicrowaveCommander.Application\MicrowaveCommander.Application.csproj", "{8BEF4865-2336-40AF-8C1B-A39750F9339D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicrowaveCommander.Front", "MicrowaveCommander.Front\MicrowaveCommander.Front.csproj", "{F20213B9-DF1A-4DFE-99A5-D2B416EEBF16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicrowaveCommander.API", "MicrowaveCommander.API\MicrowaveCommander.API.csproj", "{41D20908-63CB-4337-9B8A-3DEDB626AD81}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,13 +16,13 @@ Global
 		{065AE2B9-D5DE-4ADA-924D-CB0740A58101}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{065AE2B9-D5DE-4ADA-924D-CB0740A58101}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{065AE2B9-D5DE-4ADA-924D-CB0740A58101}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8BEF4865-2336-40AF-8C1B-A39750F9339D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8BEF4865-2336-40AF-8C1B-A39750F9339D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8BEF4865-2336-40AF-8C1B-A39750F9339D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8BEF4865-2336-40AF-8C1B-A39750F9339D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F20213B9-DF1A-4DFE-99A5-D2B416EEBF16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F20213B9-DF1A-4DFE-99A5-D2B416EEBF16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F20213B9-DF1A-4DFE-99A5-D2B416EEBF16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F20213B9-DF1A-4DFE-99A5-D2B416EEBF16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41D20908-63CB-4337-9B8A-3DEDB626AD81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41D20908-63CB-4337-9B8A-3DEDB626AD81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41D20908-63CB-4337-9B8A-3DEDB626AD81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41D20908-63CB-4337-9B8A-3DEDB626AD81}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
