@@ -1,4 +1,4 @@
-namespace MicrowaveCommander.Front.Component;
+namespace MicrowaveCommander.Front.Components;
 
 public class MicrowaveTimer
 {

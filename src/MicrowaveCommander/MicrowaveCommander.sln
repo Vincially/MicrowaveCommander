@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicrowaveCommander.Front", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicrowaveCommander.API", "MicrowaveCommander.API\MicrowaveCommander.API.csproj", "{41D20908-63CB-4337-9B8A-3DEDB626AD81}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicrowaveCommander.Infrastructure", "MicrowaveCommander.Infrastructure\MicrowaveCommander.Infrastructure.csproj", "{02D9BD75-1D93-4D49-8785-2AB33677A49B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{41D20908-63CB-4337-9B8A-3DEDB626AD81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{41D20908-63CB-4337-9B8A-3DEDB626AD81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{41D20908-63CB-4337-9B8A-3DEDB626AD81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02D9BD75-1D93-4D49-8785-2AB33677A49B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02D9BD75-1D93-4D49-8785-2AB33677A49B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02D9BD75-1D93-4D49-8785-2AB33677A49B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02D9BD75-1D93-4D49-8785-2AB33677A49B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,4 +1,4 @@
-namespace MicrowaveCommander.Front.Layout;
+namespace MicrowaveCommander.Front.Components;
 
 public class ProgramPreset
 {

@@ -1,6 +1,5 @@
-@MicrowaveCommander.API_HostAddress = http://localhost:5019
 
-GET {{MicrowaveCommander.API_HostAddress}}/weatherforecast/
+GET http://localhost:5019/api/programs
 Accept: application/json
 
 ###
