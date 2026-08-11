@@ -44,7 +44,8 @@ public class MicrowaveTimer
     
     public void ResetTimer()
     {
-        Timer.Dispose();
+        if (Status != TimerStatusEnum.Stopped)
+            Timer.Dispose();
         RemainingMinutes = 0;
         RemainingSeconds = 0;
         Status = TimerStatusEnum.Stopped;
