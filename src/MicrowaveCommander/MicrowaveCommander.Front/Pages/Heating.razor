@@ -9,20 +9,28 @@
     <div class="form-row">
         <div class="col-2 mb-3">
             <label>Minutos</label>
-            <InputNumber inputmode="numeric" id="minutes" min="0" max="2" class="form-control" @bind-value="heatingModel.Minutes"/>
+            <InputNumber inputmode="numeric" disabled="@presetSelected" id="minutes" min="0" max="2" class="form-control" @bind-value="heatingModel.Minutes"/>
         </div>
         <div class="col-2 mb-3">
             <label>Segundos</label>
-            <InputNumber inputmode="numeric" id="seconds" min="0" max="100" class="form-control" @bind-value="heatingModel.Seconds"/>
+            <InputNumber inputmode="numeric" disabled="@presetSelected" id="seconds" min="0" max="100" class="form-control" @bind-value="heatingModel.Seconds"/>
             <ValidationMessage For="() => heatingModel.Seconds"></ValidationMessage>
         </div>
         <div class="col-3 mb-3">
             <label>Potência</label>
-            <InputNumber inputmode="numeric" id="power" min="0" max="10" class="form-control" @bind-value="heatingModel.Power"/>
+            <InputNumber inputmode="numeric" disabled="@presetSelected" id="power" min="0" max="10" class="form-control" @bind-value="heatingModel.Power"/>
             
         </div>
-        <button type="submit" class="btn btn-primary">Iniciar Aquecimento</button>
-        <button type="button" class="btn btn-danger" @onclick="PauseStopHeating">Pausar/Parar</button>
+        <div class="mt-3 mb-3">
+            <button type="submit" disabled="@(presetSelected != null &&!TimerIsPaused())" class="btn btn-primary">Iniciar Aquecimento</button>
+            <button type="button" class="btn btn-danger" @onclick="PauseStopHeating">Pausar/Parar</button>
+        </div>
+        <div class="mt-3 gap-3 mb-3">
+            @foreach (var preset in BuildPresets())
+            {
+                <button type="button" class="btn btn-secondary" @onclick="@(() => StartPresets(preset))">@preset.Name</button>
+            }
+        </div>
         <div class="mt-3 mb-3">
             <h3>Timer: @(timer.RemainingMinutes.ToString().PadLeft(2, '0')):
                 @(timer.RemainingSeconds.ToString().PadLeft(2, '0'))</h3>
@@ -41,6 +49,7 @@
     private ValidationMessageStore? messageStore;
     private string processing = "";
     private string processingString = "";
+    private ProgramPreset? presetSelected;
 
     protected override void OnInitialized()
     {
@@ -91,11 +100,10 @@
             editContext.NotifyValidationStateChanged();
             return true;
         }
-
         return false;
     }
     
-    private void StartHeating(int minutes = 0, int seconds = 30, int power = 10)
+    private void StartHeating(int minutes = 0, int seconds = 30, int power = 10, string pattern = ".")
     {
         switch (timer.Status)
         {
@@ -111,23 +119,32 @@
                 
             case TimerStatusEnum.Stopped:
                 processing = "";
-                processingString = GenerateProcessingString(power);
+                processingString = GenerateProcessingString(power, pattern);
                 timer.AddHeatingTime(minutes, seconds);
                 timer.StartTimer(CreateDefaultTimer());
                 break;
         }
         _ = InvokeAsync(StateHasChanged);
     }
-    
 
-    private string GenerateProcessingString(int power)
+    private void StartPresets(ProgramPreset preset)
     {
-        var pattern = "";
+        presetSelected = preset;
+        ResetTimer();
+        heatingModel.Minutes = preset.TimeInSeconds /60;
+        heatingModel.Seconds = preset.TimeInSeconds %60 ;
+        heatingModel.Power = preset.Power;
+        StartHeating(0, preset.TimeInSeconds, preset.Power, preset.ProcessingString);
+    }
+
+    private string GenerateProcessingString(int power, string pattern)
+    {
+        string fullPattern = "";
         for (int i = 0; i < power; i++)
         {
-            pattern += ".";
+            fullPattern += pattern;
         }
-        return pattern;
+        return fullPattern;
     }
 
     private void TimerCallback(object? state)
@@ -153,9 +170,7 @@
                 processing += "Aquecimento concluído!";
             }
         }
-        
         _ = InvokeAsync(StateHasChanged);
-
     }
 
     private void ResetTimer()
@@ -170,12 +185,66 @@
         if (TimerIsRunning())
             timer.PauseTimer();
         else
+        {
+            presetSelected = null;
             ResetTimer();
+        }
     }
+
+    private List<ProgramPreset> BuildPresets() => new List<ProgramPreset>()
+    {
+        new ProgramPreset()
+        {
+            Name = "Pipoca",
+            Meal = "Pipoca (de micro-ondas)",
+            TimeInMinutes = 3,
+            TimeInSeconds = 183,
+            Power = 7,
+            Instructions = "Observar o barulho de estouros do milho, caso houver um intervalo de mais de 10 segundos entre um estouro e outro, interrompa o aquecimento.",
+            ProcessingString = "p"
+        },
+        new ProgramPreset() { 
+            Name = "Leite", 
+            Meal = "Leite",
+            TimeInMinutes = 5,
+            TimeInSeconds = 300,
+            Power = 5,
+            Instructions = "Cuidado com aquecimento de líquidos, o choque térmico aliado ao movimento do recipiente pode causar fervura imediata causando risco de queimaduras.",
+            ProcessingString = "l"
+        },
+        new ProgramPreset() { 
+            Name = "Carnes de boi", 
+            Meal = "Carne em pedaço ou fatias",
+            TimeInMinutes = 14,
+            TimeInSeconds = 840,
+            Power = 4,
+            Instructions = "Interrompa o processo na metade e vire o conteúdo com a parte de baixo para cima para o descongelamento uniforme.",
+            ProcessingString = "c"
+        },
+        new ProgramPreset() { 
+            Name = "Frango", 
+            Meal = "Frango (qualquer corte)",
+            TimeInMinutes = 8,
+            TimeInSeconds = 480,
+            Power = 7,
+            Instructions = "Interrompa o processo na metade e vire o conteúdo com a parte de baixo para cima para o descongelamento uniforme.",
+            ProcessingString = "f"
+        },
+        new ProgramPreset() { 
+            Name = "Feijão", 
+            Meal = "Feijão congelado",
+            TimeInMinutes = 8,
+            TimeInSeconds = 480,
+            Power = 9,
+            Instructions = "Interrompa o processo na metade e vire o conteúdo com a parte de baixo para cima para o descongelamento uniforme.",
+            ProcessingString = "j"
+        },
+    };
     
     private bool TimerIsRunning() => timer.Status.Equals(TimerStatusEnum.Running);
+    private bool TimerIsPaused() => timer.Status.Equals(TimerStatusEnum.Paused);
     private bool TimerIsStopped() => timer.Status.Equals(TimerStatusEnum.Stopped);
-
+    
     private bool ItIsFastInitialization() => heatingModel.Minutes is null
                                              || heatingModel.Seconds is null
                                              || heatingModel.Power is null;
